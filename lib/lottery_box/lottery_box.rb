@@ -18,6 +18,7 @@
 
 require "active_support/core_ext/class/attribute_accessors"
 require "active_support/configurable"
+require "bigdecimal"
 
 module LotteryBox
   include ActiveSupport::Configurable
@@ -54,15 +55,17 @@ module LotteryBox
       assert_total(total)
       other_rate = 0
       if group0.size > 0
-        other_rate = (1.0 - total) / group0.size
+        other_rate = (BigDecimal(1) - BigDecimal(total.to_s)) / BigDecimal(group0.size) # 小数の場合 to_s で渡さないと怒られる
       end
-      last_rate = 0.0
+      last_rate = BigDecimal("0.0")
       table = (group1 + group0).collect do |e|
-        rate = e[@rate_key] || other_rate
+        rate = BigDecimal((e[@rate_key] || other_rate).to_s)
         {:range => last_rate ... (last_rate + rate), :robj => e[:robj]}.tap { last_rate += rate }
       end
+      # BigDecimal で計算して最後に to_f で戻せば 0.9999999999999999999999999999 や 1.000000000000000000000001 が 1.0 になる
+      last_rate = last_rate.to_f
       if last_rate > 1.0
-        raise "must not happen"
+        raise "確率の合計値が1.0を越えている"
       end
       if group0.size > 0 && last_rate < 1.0
         raise "はずれ要素があるのにもかかわらず最後が 1.0 になっていない"

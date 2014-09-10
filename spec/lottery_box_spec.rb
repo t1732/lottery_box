@@ -17,6 +17,20 @@ describe do
     end
   end
 
+  it "ハズレが8個で確率が0.7の場合、小数の誤差が発生して合計が1.0を越えてしまう不具合をBigDecimalで回避" do
+    box = [
+      {:robj=> :nil, :rate => 0.2},
+      {:robj=> :nil},
+      {:robj=> :nil},
+      {:robj=> :nil},
+      {:robj=> :nil},
+      {:robj=> :nil},
+      {:robj=> :nil},
+      {:robj=> :nil},
+    ]
+    LotteryBox::Base.new(box)
+  end
+
   it "確率の合計が 0..1.0 の範囲外" do
     expect { LotteryBox::Base.new([{:rate => 1.1}]) }.to raise_error(ArgumentError)
     expect { LotteryBox::Base.new([{:rate => -0.1}]) }.to raise_error(ArgumentError)
