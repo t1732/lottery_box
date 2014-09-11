@@ -10,26 +10,17 @@ box = [
   {:robj => "C"},
 ]
 
-10000.times.each_with_object(Hash.new(0)){|*, m| m[LotteryBox.pick(box)] += 1 }.sort_by{|k, v|v} # => [["S", 106], ["A", 1031], ["B", 1969], ["C", 6894]]
+# 普通の使い方
+LotteryBox.pick(box)            # => "C"
 
-pp LotteryBox::Base.new(box).table
-# >> [{:range=>
-# >>    #<BigDecimal:7fbc5117e458,'0.0',9(18)>
-# >>    ...
-# >>    #<BigDecimal:7fbc5117e110,'0.1E-1',9(27)>,
-# >>   :robj=>"S"},
-# >>  {:range=>
-# >>    #<BigDecimal:7fbc5117df80,'0.1E-1',9(27)>
-# >>    ...
-# >>    #<BigDecimal:7fbc5117ddc8,'0.11E0',9(18)>,
-# >>   :robj=>"A"},
-# >>  {:range=>
-# >>    #<BigDecimal:7fbc5117dc60,'0.11E0',9(18)>
-# >>    ...
-# >>    #<BigDecimal:7fbc5117da58,'0.31E0',9(18)>,
-# >>   :robj=>"B"},
-# >>  {:range=>
-# >>    #<BigDecimal:7fbc5117d8f0,'0.31E0',9(18)>
-# >>    ...
-# >>    #<BigDecimal:7fbc5117d710,'0.1E1',9(18)>,
-# >>   :robj=>"C"}]
+# 分布数を確認する例
+10000.times.each_with_object(Hash.new(0)){|*, m| m[LotteryBox.pick(box)] += 1 }.sort_by{|k, v|v} # => [["S", 105], ["A", 970], ["B", 2020], ["C", 6905]]
+
+# 各レートをパーセンテージに変換する例
+LotteryBox::Base.new(box).table.each do |attrs|
+  p [attrs[:robj], "%.2f %%" % (attrs[:rate] * 100)]
+end
+# >> ["S", "1.00 %"]
+# >> ["A", "10.00 %"]
+# >> ["B", "20.00 %"]
+# >> ["C", "69.00 %"]
