@@ -66,14 +66,14 @@ module LotteryBox
         last_rate += rate
       end
       # BigDecimal で計算して最後に to_f で戻せば 0.9999999999999999999999999999 や 1.000000000000000000000001 が 1.0 になる
-      if last_rate > (1.0 + Float::EPSILON)
+      if last_rate >= (1.0 + Float::EPSILON)
         raise "確率の合計値が1.0を越えている"
       end
-      if group0.size > 0 && last_rate < (1.0 - Float::EPSILON)
+      if group0.size > 0 && (last_rate - 1.0).abs > Float::EPSILON
         raise "はずれ要素があるのにもかかわらず最後が 1.0 になっていない : #{last_rate}"
       end
       # はずれ要素がない場合のみ 1.0 に届かないため補完する
-      if last_rate < (1.0 - Float::EPSILON)
+      if last_rate <= (1.0 - Float::EPSILON)
         table << {:range => last_rate...1.0, :rate => 1.0 - last_rate, :robj => nil}
       end
       table
