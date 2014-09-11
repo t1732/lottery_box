@@ -13,7 +13,7 @@ class TestLotteryBox < Test::Unit::TestCase
     end
   end
 
-  test "ハズレが8個で確率が0.7の場合、小数の誤差が発生して合計が1.0を越えてしまう不具合をBigDecimalで回避" do
+  test "ハズレが8個で確率が0.7の場合、小数の誤差が発生して合計が1.0を越えてしまう不具合" do
     box = [
       {:robj=> :nil, :rate => 0.2},
       {:robj=> :nil},
@@ -23,6 +23,17 @@ class TestLotteryBox < Test::Unit::TestCase
       {:robj=> :nil},
       {:robj=> :nil},
       {:robj=> :nil},
+    ]
+    LotteryBox::Base.new(box)
+  end
+
+  test "BigDecimalを使った場合だとこの例でエラー" do
+    box = [
+      {:robj => "", :rate => 0.1},
+      {:robj => "", :rate => 0.1},
+      {:robj => "", :rate => 0.1},
+      {:robj => "", :rate => 0.3},
+      {:robj => ""},
     ]
     LotteryBox::Base.new(box)
   end

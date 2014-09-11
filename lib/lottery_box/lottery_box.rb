@@ -55,26 +55,25 @@ module LotteryBox
       assert_total(total)
       other_rate = 0
       if group0.size > 0
-        other_rate = (BigDecimal(1) - BigDecimal(total.to_s)) / BigDecimal(group0.size) # 小数の場合 to_s で渡さないと怒られる
+        other_rate = (1.0r - Rational(total)) / Rational(group0.size) # 小数の場合 to_s で渡さないと怒られる
       end
-      last_rate = BigDecimal("0.0")
+      last_rate = 0.0r
       table = []
       (group1 + group0).each do |e|
-        rate = BigDecimal((e[@rate_key] || other_rate).to_s)
+        rate = Rational(e[@rate_key] || other_rate)
         range = last_rate ... (last_rate + rate)
         table << {:range => range, :rate => rate, :robj => e[:robj]}
         last_rate += rate
       end
       # BigDecimal で計算して最後に to_f で戻せば 0.9999999999999999999999999999 や 1.000000000000000000000001 が 1.0 になる
-      last_rate = last_rate.to_f
-      if last_rate > 1.0
+      if last_rate > (1.0 + Float::EPSILON)
         raise "確率の合計値が1.0を越えている"
       end
-      if group0.size > 0 && last_rate < 1.0
-        raise "はずれ要素があるのにもかかわらず最後が 1.0 になっていない"
+      if group0.size > 0 && last_rate < (1.0 - Float::EPSILON)
+        raise "はずれ要素があるのにもかかわらず最後が 1.0 になっていない : #{last_rate}"
       end
       # はずれ要素がない場合のみ 1.0 に届かないため補完する
-      if last_rate < 1.0
+      if last_rate < (1.0 - Float::EPSILON)
         table << {:range => last_rate...1.0, :rate => 1.0 - last_rate, :robj => nil}
       end
       table

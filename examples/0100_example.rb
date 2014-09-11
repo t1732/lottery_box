@@ -14,7 +14,7 @@ box = [
 LotteryBox.pick(box)            # => "C"
 
 # 分布数を確認する例
-10000.times.each_with_object(Hash.new(0)){|*, m| m[LotteryBox.pick(box)] += 1 }.sort_by{|k, v|v} # => [["S", 105], ["A", 970], ["B", 2020], ["C", 6905]]
+10000.times.each_with_object(Hash.new(0)){|*, m| m[LotteryBox.pick(box)] += 1 }.sort_by{|k, v|v} # => [["S", 102], ["A", 1000], ["B", 2002], ["C", 6896]]
 
 # 各レートをパーセンテージに変換する例
 LotteryBox::Base.new(box).table.each do |attrs|
