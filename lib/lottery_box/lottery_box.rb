@@ -22,7 +22,7 @@ require "bigdecimal"
 
 module LotteryBox
   include ActiveSupport::Configurable
-  config.default_strategy = -> { RateStrategy.new }
+  config.default_strategy = proc { RateStrategy.new }
 
   def self.pick(*args)
     Base.new(*args).pick
@@ -40,7 +40,7 @@ module LotteryBox
 
     def pick
       return if @table.empty?
-      if e = @strategy.pick_element(@table)
+      if e = @strategy.element_pick(@table)
         e[:robj]
       end
     end
@@ -55,7 +55,7 @@ module LotteryBox
       assert_total(total)
       other_rate = 0
       if group0.size > 0
-        other_rate = (1.0r - Rational(total)) / Rational(group0.size) # 小数の場合 to_s で渡さないと怒られる
+        other_rate = (1.0r - total.to_r) / group0.size.to_r
       end
       last_rate = 0.0r
       table = []
@@ -100,7 +100,7 @@ module LotteryBox
       @r = r
     end
 
-    def pick_element(table)
+    def element_pick(table)
       table.find{|e|e[:range].include?(@r)}
     end
   end
@@ -110,14 +110,14 @@ module LotteryBox
     cattr_accessor :index
     @@index ||= 0
 
-    def pick_element(table)
+    def element_pick(table)
       table[@@index.modulo(table.size)].tap { @@index += 1 }
     end
   end
 
   # 一様にサンプルする (開発用)
   class SampleStrategy
-    def pick_element(table)
+    def element_pick(table)
       table.sample
     end
   end
@@ -128,7 +128,7 @@ module LotteryBox
       @index = index
     end
 
-    def pick_element(table)
+    def element_pick(table)
       table[@index]
     end
   end
