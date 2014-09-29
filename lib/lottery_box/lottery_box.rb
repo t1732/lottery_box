@@ -60,7 +60,7 @@ module LotteryBox
       last_rate = 0.0r
       table = []
       (group1 + group0).each do |e|
-        rate = Rational(e[@rate_key] || other_rate)
+        rate = (e[@rate_key] || other_rate).to_r
         range = last_rate ... (last_rate + rate)
         table << {:range => range, :rate => rate, :robj => e[:robj]}
         last_rate += rate
