@@ -96,12 +96,17 @@ module LotteryBox
 
   # 確率 (本番用)
   class RateStrategy
-    def initialize(r = rand)
-      @r = r
+    def initialize(randy = Random.new)
+      @randy = randy
     end
 
     def element_pick(table)
-      table.find{|e|e[:range].include?(@r)}
+      if @randy.respond_to?(:rand)
+        r = @randy.rand
+      else
+        r = @randy
+      end
+      table.find{|e|e[:range].include?(r)}
     end
   end
 
