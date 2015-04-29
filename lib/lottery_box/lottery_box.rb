@@ -137,4 +137,15 @@ module LotteryBox
       table[@index]
     end
   end
+
+  # インスタンスにインデックスを保持する版
+  class OrderStrategy
+    def initialize(index = 0)
+      @index = index
+    end
+
+    def element_pick(table)
+      table[@index.modulo(table.size)].tap { @index += 1 }
+    end
+  end
 end
