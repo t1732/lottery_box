@@ -31,10 +31,10 @@ module LotteryBox
   class Base
     attr_accessor :box, :table, :rate_key
 
-    def initialize(box, rate_key: nil, strategy: nil)
+    def initialize(box, options = {})
       @box = box
-      @rate_key = rate_key || :rate
-      @strategy = strategy || LotteryBox.config.default_strategy.call
+      @rate_key = options[:rate_key] || :rate
+      @strategy = options[:strategy] || LotteryBox.config.default_strategy.call
       @table = table_build
     end
 
@@ -55,9 +55,9 @@ module LotteryBox
       assert_total(total)
       other_rate = 0
       if group0.size > 0
-        other_rate = (1.0r - total.to_r) / group0.size.to_r
+        other_rate = (1.0.to_r - total.to_r) / group0.size.to_r
       end
-      last_rate = 0.0r
+      last_rate = 0.0.to_r
       table = []
       (group1 + group0).each do |e|
         rate = (e[@rate_key] || other_rate).to_r
